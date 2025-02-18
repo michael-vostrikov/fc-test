@@ -1,0 +1,45 @@
+'use client';
+
+import { HttpLink } from '@apollo/client';
+import {
+  ApolloNextAppProvider,
+  ApolloClient,
+  InMemoryCache,
+} from '@apollo/experimental-nextjs-app-support';
+
+// have a function to create a client for you
+function makeClient() {
+  const httpLink = new HttpLink({
+    uri: 'https://cms.trial-task.k8s.ext.fcse.io/graphql',
+    fetchOptions: { cache: 'no-store' },
+  });
+
+  const client = new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache(),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'ignore',
+      },
+      query: {
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'all',
+      },
+      mutate: {
+        errorPolicy: 'all',
+      },
+    },
+  });
+
+  return client;
+}
+
+// you need to create a component to wrap your app in
+export function ApolloWrapper({ children }: React.PropsWithChildren) {
+  return (
+    <ApolloNextAppProvider makeClient={makeClient}>
+      {children}
+    </ApolloNextAppProvider>
+  );
+}

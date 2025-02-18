@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.1",
+    "@apollo/experimental-nextjs-app-support": "^0.11.9",
     "@heroui/button": "^2.2.10",
     "@heroui/input": "^2.4.10",
     "@heroui/react": "^2.6.14",
