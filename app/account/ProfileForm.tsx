@@ -5,6 +5,7 @@ import {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
 import {useLazyQuery} from "@apollo/client";
 import {QUERY_USER, UsersPermissionsUser} from "@/lib/graphql";
+import {useTranslations} from "next-intl";
 
 const LOGIN_URL = '/';
 
@@ -14,6 +15,8 @@ export default function ProfileForm() {
   const [user, setUser] = useState(undefined as UsersPermissionsUser|undefined);
 
   const [getUser, { loading, error}] = useLazyQuery<{user: UsersPermissionsUser}>(QUERY_USER);
+
+  const t = useTranslations('app');
 
   useEffect(() => {
     async function loadUser() {
@@ -39,8 +42,8 @@ export default function ProfileForm() {
     router.push(LOGIN_URL);
   }
 
-  if (loading) return 'Loading...';
-  if (error) return `Error! ${error.message}`;
+  if (loading) return t('Loading');
+  if (error) return t(`Error: {message}`, {message: error.message});
 
   return (
     <Form
@@ -48,13 +51,19 @@ export default function ProfileForm() {
       validationBehavior="native"
       onSubmit={null}
     >
-      <Input readOnly={true} disabled={true} value={user?.firstName}/>
-      <Input readOnly={true} disabled={true} value={user?.lastName}/>
+      <div className="flex flex-col gap-4">
+        <Input label={t('First name')} labelPlacement="outside" readOnly={true} disabled={true}
+               value={user?.firstName}/>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <Input label={t('Last name')} labelPlacement="outside" readOnly={true} disabled={true} value={user?.lastName}/>
+      </div>
 
       <Button className="w-full" color="primary" type="button"
               disabled={loading} disableAnimation={loading}
               onPress={onLogout}
-      >Logout</Button>
+      >{t('Logout')}</Button>
     </Form>
-  );
+);
 }

@@ -1,0 +1,12 @@
+{
+  "app": {
+    "Email": "Email",
+    "First name": "First name",
+    "Last name": "Last name",
+    "Password": "Password",
+    "Login": "Login",
+    "Logout": "Logout",
+    "Loading": "Loading...",
+    "Error: {message}": "Error: {message}"
+  }
+}

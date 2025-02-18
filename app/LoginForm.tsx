@@ -5,6 +5,7 @@ import {useEffect, useState} from "react";
 import {useMutation} from "@apollo/client";
 import {useRouter} from "next/navigation";
 import {MUTATION_LOGIN, UsersPermissionsLoginPayload} from "@/lib/graphql";
+import {useTranslations} from 'next-intl';
 
 const ACCOUNT_URL = '/account';
 
@@ -37,6 +38,8 @@ export default function LoginForm() {
   const [errors, setErrors] = useState({});
 
   const [loginMutation, { loading, error }] = useMutation<{login: UsersPermissionsLoginPayload}>(MUTATION_LOGIN);
+
+  const t = useTranslations('app');
 
   useEffect(() => {
     const currentJwt = localStorage.getItem('jwt');
@@ -83,12 +86,12 @@ export default function LoginForm() {
       onSubmit={onSubmit}
     >
       <div className="flex flex-col gap-4">
-        <Input label="Email" name="email" value="test@freshcells.de"/>
-        <Input type="password" label="Password" name="password" value="KTKwXm2grV4wHzW"/>
+        <Input isRequired type="email" label={t('Email')} name="email"/>
+        <Input isRequired type="password" label={t('Password')} name="password"/>
 
         <Button className="w-full" color="primary" type="submit"
                 disabled={loading} disableAnimation={loading}
-        >Login</Button>
+        >{t('Login')}</Button>
       </div>
 
       <div className="flex flex-col gap-4">
