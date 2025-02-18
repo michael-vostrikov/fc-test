@@ -1,32 +1,14 @@
 'use client';
 
 import {Button, Form, Input} from "@heroui/react";
-import {useState} from "react";
-import {gql, useMutation} from "@apollo/client";
+import {useEffect, useState} from "react";
+import {useMutation} from "@apollo/client";
 import {useRouter} from "next/navigation";
+import {MUTATION_LOGIN, UsersPermissionsLoginPayload} from "@/lib/graphql";
 
-type LoginFormData = {email: string, password: string};
+const ACCOUNT_URL = '/account';
 
-const LOGIN_MUTATION = gql`
-  mutation ($identifier: String!, $password: String!) {
-    login (input: {identifier: $identifier, password: $password}) {
-      jwt
-      user {
-        id
-        username
-        email
-      }
-    }
-  }
-`;
-
-type LoginMutationResult = {
-  login: UsersPermissionsLoginPayload,
-}
-
-type UsersPermissionsLoginPayload = {
-  jwt: string;
-}
+type LoginFormData = { email: string, password: string };
 
 function validateFormData(formData: LoginFormData): {[name: string]: string} {
   // For the test task standard HTML attributes are enough, but in real application it's usually no so,
@@ -53,7 +35,15 @@ export default function LoginForm() {
   const router = useRouter();
 
   const [errors, setErrors] = useState({});
-  const [loginMutation, { loading, error }] = useMutation<LoginMutationResult>(LOGIN_MUTATION);
+
+  const [loginMutation, { loading, error }] = useMutation<{login: UsersPermissionsLoginPayload}>(MUTATION_LOGIN);
+
+  useEffect(() => {
+    const currentJwt = localStorage.getItem('jwt');
+    if (currentJwt) {
+      router.push(ACCOUNT_URL);
+    }
+  }, []);
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -67,22 +57,23 @@ export default function LoginForm() {
     }
 
     await performLogin(formData);
-    router.push('/account');
+    router.push(ACCOUNT_URL);
   }
 
   async function performLogin(formData: LoginFormData) {
-    const variables = { variables: { identifier: formData.email, password: formData.password } };
-    const result = await loginMutation(variables);
+    const options = { variables: { identifier: formData.email, password: formData.password } };
+    const result = await loginMutation(options);
 
-    const jwt = result?.data?.login?.jwt;
-    if (!jwt) {
+    const loginData = result?.data?.login;
+    if (!loginData?.jwt) {
       throw new Error('Token not found');
     }
 
-    localStorage.setItem('jwt', jwt);
+    localStorage.setItem('jwt', loginData.jwt);
+    localStorage.setItem('userId', loginData.user.id);
   }
 
-  const mutationErrors = (error?.cause?.extensions?.exception?.data?.message?.[0]?.messages ?? []).map(messageData => messageData.message);
+  const mutationErrors = ((error?.cause?.extensions as any)?.exception?.data?.message?.[0]?.messages ?? []).map(messageData => messageData.message);
 
   return (
     <Form

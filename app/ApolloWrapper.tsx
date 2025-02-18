@@ -6,6 +6,7 @@ import {
   ApolloClient,
   InMemoryCache,
 } from '@apollo/experimental-nextjs-app-support';
+import {setContext} from "@apollo/client/link/context";
 
 // have a function to create a client for you
 function makeClient() {
@@ -14,8 +15,18 @@ function makeClient() {
     fetchOptions: { cache: 'no-store' },
   });
 
+  const authLink = setContext((_, { headers }) => {
+    const token = localStorage.getItem('jwt');
+    headers = headers ?? {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    return { headers };
+  });
+
   const client = new ApolloClient({
-    link: httpLink,
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
     defaultOptions: {
       watchQuery: {
