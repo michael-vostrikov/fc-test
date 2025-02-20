@@ -9,9 +9,9 @@ import {useTranslations} from 'next-intl';
 
 const ACCOUNT_URL = '/account';
 
-type LoginFormData = { email: string, password: string };
+export type LoginFormData = { email: string, password: string };
 
-function validateFormData(formData: LoginFormData): {[name: string]: string} {
+export function validateFormData(formData: LoginFormData): {[name: string]: string} {
   // For the test task standard HTML attributes are enough, but in real application it's usually no so,
   // so I decided to make validation.
   // I made it manually because there is no requirements about this,
