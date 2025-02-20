@@ -6,6 +6,7 @@ import "./globals.css";
 import { ApolloWrapper } from "@/app/ApolloWrapper";
 import {NextIntlClientProvider} from 'next-intl';
 import {getLocale, getMessages} from 'next-intl/server';
+import ErrorBoundary from "@/app/ErrorBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,11 +36,13 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ApolloWrapper>
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
-        </ApolloWrapper>
+        <ErrorBoundary>
+          <ApolloWrapper>
+            <NextIntlClientProvider messages={messages}>
+              {children}
+            </NextIntlClientProvider>
+          </ApolloWrapper>
+        </ErrorBoundary>
       </body>
     </html>
   );
